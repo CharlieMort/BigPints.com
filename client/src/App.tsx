@@ -9,10 +9,12 @@ function App() {
   const [packet, setPacket] = useState<IPacket>()
   const [clientData, setClientData] = useState<IClient>()
   const [roomData, setRoomData] = useState<IRoom>()
+  const [connected, setConnected] = useState(false)
 
   useEffect(() => {
     socket.onopen = () => {
       console.log("wagwan")
+      setConnected(true)
       if (sessionStorage.tabID == undefined) {
           sessionStorage.tabID = crypto.randomUUID()
       }
@@ -22,14 +24,20 @@ function App() {
         type: "setup",
         data: `clientconnect ${sessionStorage.tabID}`
       } as IPacket))
+      socket.send("ping")
     }
 
     socket.onclose = () => {
+      setConnected(false)
       console.log("closed bruv")
     }
 
     socket.onmessage = (event) => {
-      setPacket(JSON.parse(event.data))
+      if (event.data == "pong") {
+        socket.send("ping")
+      } else {
+        setPacket(JSON.parse(event.data))
+      }
     }
   }, [])
 
@@ -52,9 +60,9 @@ function App() {
     <div className="App">
       <h1>🍺BigPint.com</h1>
       {
-        clientData === undefined
+        clientData === undefined || !connected
         ? <div>
-            <h2>Waiting To Connect...</h2>
+            <h2>Connection Status: {connected?"Online":"Offline"}</h2>
           </div>
         : roomData === undefined
           ? <RoomJoin client={clientData} />

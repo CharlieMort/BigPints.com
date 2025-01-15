@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -71,6 +72,11 @@ func (client *Client) ReadPackets() {
 		if err != nil {
 			break
 		}
+		if string(packetJson) == "ping" {
+			fmt.Printf("#")
+			client.Send <- Packet{Data: "pong"}
+			continue
+		}
 		var packet Packet
 		err = json.Unmarshal(packetJson, &packet)
 		fmt.Println("Received Packet From Client ---------------------------------------------")
@@ -123,8 +129,15 @@ func (client *Client) WritePackets() {
 				client.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-
-			err := client.Conn.WriteJSON(packet)
+			var err error
+			if packet.Data == "pong" {
+				go func() {
+					time.Sleep(time.Second * 10)
+					err = client.Conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+				}()
+			} else {
+				err = client.Conn.WriteJSON(packet)
+			}
 			if err != nil {
 				log.Println("Error WritePackets (1)")
 				log.Println(err)
