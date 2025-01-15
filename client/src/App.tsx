@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { socket } from './Comps/socket.ts';
+import { ReconnectSocket, socket, SOCKURL } from './Comps/socket.ts';
 import { IClient, IPacket, IRoom } from './types.ts';
 import RoomJoin from './Comps/RoomJoin.tsx';
 import Lobby from './Comps/Lobby.tsx';
@@ -10,6 +10,7 @@ function App() {
   const [clientData, setClientData] = useState<IClient>()
   const [roomData, setRoomData] = useState<IRoom>()
   const [connected, setConnected] = useState(false)
+  const [retry, setRetry] = useState(false)
 
   useEffect(() => {
     socket.onopen = () => {
@@ -18,13 +19,17 @@ function App() {
       if (sessionStorage.tabID == undefined) {
           sessionStorage.tabID = crypto.randomUUID()
       }
-      socket.send(JSON.stringify({
-        from: "0",
-        to: "0",
-        type: "setup",
-        data: `clientconnect ${sessionStorage.tabID}`
-      } as IPacket))
-      socket.send("ping")
+      try {
+        socket.send(JSON.stringify({
+          from: "0",
+          to: "0",
+          type: "setup",
+          data: `clientconnect ${sessionStorage.tabID}`
+        } as IPacket))
+        socket.send("ping")
+      } catch {
+        console.log("Failed Send")
+      }
     }
 
     socket.onclose = () => {
@@ -39,7 +44,19 @@ function App() {
         setPacket(JSON.parse(event.data))
       }
     }
-  }, [])
+  }, [socket])
+
+  useEffect(() => {
+      let ReConnectTimer = setInterval(() => {
+        setRetry(!retry)
+        if (connected == false){
+          ReconnectSocket()
+        }
+      }, 2000)
+      return () => {
+        clearInterval(ReConnectTimer)
+      }
+    }, [retry])
 
   useEffect(() => {
     if (packet === undefined) {
@@ -58,7 +75,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>🍺BigPint.com</h1>
+      <h1>🍺BigPint.com {retry?"1":"0"}</h1>
       {
         clientData === undefined || !connected
         ? <div>
