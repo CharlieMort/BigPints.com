@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -122,6 +123,24 @@ func (h *Hub) JoinRoom(client *Client, roomCode string) {
 	}
 }
 
+func (h *Hub) LeaveRoom(client *Client, roomCode string) {
+	roomCode = strings.ToLower(roomCode)
+	if _, ok := h.rooms[roomCode]; ok {
+		room := h.rooms[roomCode]
+		if room.Host == client {
+			if len(room.Clients) == 1 {
+				delete(h.rooms, roomCode)
+			} else {
+				room.Clients = RemoveClient(room.Clients, slices.Index(room.Clients, client))
+				room.Host = room.Clients[0]
+				h.SendRoomUpdate(roomCode)
+			}
+		}
+	} else {
+		log.Printf("Client:%s Failed to join the Room:%s", client.Id, roomCode)
+	}
+}
+
 func (h *Hub) SystemPacket(packet Packet) {
 	sysCmd := strings.Split(packet.Data, " ")
 	switch sysCmd[0] {
@@ -147,6 +166,9 @@ func (h *Hub) run() {
 		case client := <-h.unregister:
 			fmt.Println("Client Disconnect ---------------------------------------------")
 			client.Print()
+			if client.RoomCode != "" {
+				h.LeaveRoom(client, client.RoomCode)
+			}
 			fmt.Println("---------------------------------------------------------------")
 			h.clients[client] = false
 		case packet := <-h.broadcast:

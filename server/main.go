@@ -150,6 +150,10 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.ReadPackets()
 }
 
+func RemoveClient(s []*Client, index int) []*Client {
+	return append(s[:index], s[index+1:]...)
+}
+
 func Chk(r *http.Request) bool {
 	return true
 }
