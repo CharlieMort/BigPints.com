@@ -116,6 +116,17 @@ func (client *Client) ReadPackets() {
 			case "createroom":
 				roomCode := client.Hub.CreateRoom()
 				client.Hub.JoinRoom(client, roomCode)
+			case "startgame":
+				switch sysCmd[1] {
+				case "spygame":
+					game := &SpyGame{Room: client.Hub.rooms[client.RoomCode]}
+					game.SetupGame()
+
+					client.Hub.rooms[client.RoomCode].Game = game
+					client.Hub.SendRoomUpdate(client.RoomCode)
+
+					game.StartGame()
+				}
 			}
 		}
 	}

@@ -20,8 +20,9 @@ export interface IPacket {
 }
 
 export interface ISpyGame {
-  spies: number[]
+  isSpy: boolean
   prompt: string
+  timer: number
 }
 
 export interface ISettings {

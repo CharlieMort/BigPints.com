@@ -66,6 +66,7 @@ func (h *Hub) TabOpen(id string) *Client {
 }
 
 func (h *Hub) SendRoomUpdate(roomCode string) {
+	fmt.Println("Sending Room Update")
 	cJSON := make([]ClientJSON, 0)
 	for _, client := range h.rooms[roomCode].Clients {
 		cJSON = append(cJSON, client.ClientJSON)
@@ -74,7 +75,7 @@ func (h *Hub) SendRoomUpdate(roomCode string) {
 	if h.rooms[roomCode].Game != nil {
 		gType = h.rooms[roomCode].Game.GetType()
 	}
-	fmt.Println(gType)
+
 	dat, err := json.Marshal(RoomJSON{
 		RoomCode: roomCode,
 		Host:     h.rooms[roomCode].Host.ClientJSON,
@@ -93,6 +94,7 @@ func (h *Hub) SendRoomUpdate(roomCode string) {
 			Data: string(dat),
 		})
 	}
+	fmt.Println()
 }
 
 func (h *Hub) CreateRoom() string {
@@ -143,19 +145,6 @@ func (h *Hub) LeaveRoom(client *Client, roomCode string) {
 		}
 	} else {
 		log.Printf("Client:%s Failed to join the Room:%s", client.Id, roomCode)
-	}
-}
-
-func (h *Hub) SystemPacket(packet Packet) {
-	sysCmd := strings.Split(packet.Data, " ")
-	switch sysCmd[0] {
-	case "createroom":
-		client := h.GetClientFromID(packet.From)
-		if client == nil {
-			log.Printf("Client:" + packet.From + " Couldnt Be Found")
-			return
-		}
-
 	}
 }
 

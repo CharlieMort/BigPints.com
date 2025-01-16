@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { ReconnectSocket, socket, SOCKURL } from './Comps/socket.ts';
-import { IClient, IPacket, IRoom } from './types.ts';
+import { socket, SOCKURL } from './Comps/socket.ts';
+import { IClient, IPacket, IRoom, ISpyGame } from './types.ts';
 import RoomJoin from './Comps/RoomJoin.tsx';
 import Lobby from './Comps/Lobby.tsx';
 
@@ -9,6 +9,7 @@ function App() {
   const [packet, setPacket] = useState<IPacket>()
   const [clientData, setClientData] = useState<IClient>()
   const [roomData, setRoomData] = useState<IRoom>()
+  const [gameData, setGameData] = useState<ISpyGame>()
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {
@@ -54,6 +55,9 @@ function App() {
       case "roomData":
         setRoomData(JSON.parse(packet.data))
         break;
+      case "gameData":
+        setGameData(JSON.parse(packet.data))
+        break
     }
   }, [packet])
 
@@ -68,7 +72,13 @@ function App() {
           </div>
         : roomData === undefined
           ? <RoomJoin client={clientData} />
-          : <Lobby client={clientData} room={roomData} />
+          : roomData.gameType === ""
+            ? <Lobby client={clientData} room={roomData} />
+            : gameData === undefined
+              ? <h2>{roomData.gameType}</h2>
+              : <div>
+                  <h2>{gameData.isSpy?"SPY":gameData.prompt}</h2>
+                </div>
       }
     </div>
   );

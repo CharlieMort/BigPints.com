@@ -14,7 +14,7 @@ const Lobby = ({client, room}: ILobbyProps) => {
             from: client.id,
             to: "0",
             type: "toSystem",
-            data: `startgame spygame ${room.roomCode}`
+            data: "startgame spygame"
         } as IPacket))
     }
 
