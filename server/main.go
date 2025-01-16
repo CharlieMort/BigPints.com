@@ -104,6 +104,9 @@ type spaHandler struct {
 }
 
 func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/api/image/get/" {
+		return
+	}
 	path := filepath.Join(h.staticPath, r.URL.Path)
 	indexPath := filepath.Join(h.staticPath, h.indexPath)
 	log.Printf("URL: %s outPATH: %s indexPath:%s\n", r.URL.Path, path, indexPath)

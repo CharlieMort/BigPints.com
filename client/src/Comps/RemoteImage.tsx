@@ -10,12 +10,15 @@ const RemoteImage = ({uuid}: IRemoteImageProps) => {
 
     useEffect(() => {
         console.log("Getting Image for ", uuid)
+        if (uuid === undefined || uuid === "") {
+            return
+        }
         fetch(`${API_URL}/api/image/get/${uuid}`, {
             method: "GET"
         }).then((r) => {
             r.text().then((dat) => setImageData(dat))
         })
-    }, [])
+    }, [uuid])
 
     return(
         <img className="Photo" src={imageData===""?undefined:imageData} alt='Taken photo'/>

@@ -92,7 +92,9 @@ func (client *Client) ReadPackets() {
 				fmt.Println("Client Exists ------------------------------------")
 				client.ClientJSON = oldClient.ClientJSON
 				if client.RoomCode != "" {
-					client.Hub.JoinRoom(client, client.RoomCode)
+					if !client.Hub.JoinRoom(client, client.RoomCode) {
+						client.SendClientJSON()
+					}
 				} else {
 					client.SendClientJSON()
 				}

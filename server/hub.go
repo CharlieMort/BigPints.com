@@ -107,7 +107,7 @@ func (h *Hub) CreateRoom() string {
 	return roomCode
 }
 
-func (h *Hub) JoinRoom(client *Client, roomCode string) {
+func (h *Hub) JoinRoom(client *Client, roomCode string) bool {
 	roomCode = strings.ToLower(roomCode)
 	if _, ok := h.rooms[roomCode]; ok {
 		if h.rooms[roomCode].Host == nil {
@@ -118,8 +118,10 @@ func (h *Hub) JoinRoom(client *Client, roomCode string) {
 		client.SendClientJSON()
 		h.SendRoomUpdate(roomCode)
 		log.Printf("Client:%s Joined the Room:%s", client.Id, roomCode)
+		return true
 	} else {
 		log.Printf("Client:%s Failed to join the Room:%s", client.Id, roomCode)
+		return false
 	}
 }
 
@@ -135,6 +137,9 @@ func (h *Hub) LeaveRoom(client *Client, roomCode string) {
 				room.Host = room.Clients[0]
 				h.SendRoomUpdate(roomCode)
 			}
+		} else {
+			room.Clients = RemoveClient(room.Clients, slices.Index(room.Clients, client))
+			h.SendRoomUpdate(roomCode)
 		}
 	} else {
 		log.Printf("Client:%s Failed to join the Room:%s", client.Id, roomCode)
