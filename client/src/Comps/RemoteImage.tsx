@@ -20,8 +20,12 @@ const RemoteImage = ({uuid}: IRemoteImageProps) => {
         })
     }, [uuid])
 
+    if (imageData == "") {
+        return <></>
+    }
+
     return(
-        <img className="Photo" src={imageData===""?undefined:imageData} alt='Taken photo'/>
+        <img className="Photo" src={imageData} alt='Taken photo'/>
     )
 }
 
