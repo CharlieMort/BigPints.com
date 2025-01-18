@@ -81,6 +81,7 @@ func (client *Client) ReadPackets() {
 		err = json.Unmarshal(packetJson, &packet)
 		fmt.Println("Received Packet From Client ---------------------------------------------")
 		fmt.Printf("From:%s\nTo:%s\nType:%s\nData:%s\n", packet.From, packet.To, packet.Type, packet.Data)
+		fmt.Println("-------------------------------------------------------------------------")
 		if err != nil {
 			log.Printf("Error ReadPackets(1) %v", err)
 		}
@@ -92,12 +93,18 @@ func (client *Client) ReadPackets() {
 				fmt.Println("Client Exists ------------------------------------")
 				client.ClientJSON = oldClient.ClientJSON
 				if client.RoomCode != "" {
+					client.Hub.LeaveRoom(oldClient, client.RoomCode)
 					if !client.Hub.JoinRoom(client, client.RoomCode) {
 						client.SendClientJSON()
+					} else {
+						if client.Hub.rooms[client.RoomCode].Game != nil {
+							client.Hub.rooms[client.RoomCode].Game.SendUpdateToClient(client)
+						}
 					}
 				} else {
 					client.SendClientJSON()
 				}
+				delete(client.Hub.clients, oldClient)
 			} else {
 				fmt.Println("Client Doesn't Exist -----------------------------")
 			}

@@ -117,8 +117,8 @@ func (h *Hub) JoinRoom(client *Client, roomCode string) bool {
 		}
 		h.rooms[roomCode].Clients = append(h.rooms[roomCode].Clients, client)
 		client.RoomCode = roomCode
-		client.SendClientJSON()
 		h.SendRoomUpdate(roomCode)
+		client.SendClientJSON()
 		log.Printf("Client:%s Joined the Room:%s", client.Id, roomCode)
 		return true
 	} else {
@@ -161,11 +161,12 @@ func (h *Hub) run() {
 			fmt.Println("Client Disconnect ---------------------------------------------")
 			client.Print()
 			if client.RoomCode != "" {
-				h.LeaveRoom(client, client.RoomCode)
+				//h.LeaveRoom(client, client.RoomCode)
 			}
 			fmt.Println("---------------------------------------------------------------")
 			h.clients[client] = false
 		case packet := <-h.broadcast:
+			fmt.Println("broadcast")
 			fmt.Println(packet)
 			//h.SendPacket(packet)
 		}

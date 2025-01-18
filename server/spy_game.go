@@ -92,30 +92,40 @@ func (game *SpyGame) StartGame() {
 	// }()
 }
 
+func (game *SpyGame) SendUpdateToClient(client *Client) {
+	var sgd SpyGameData
+	if slices.Contains(game.Spies, client) {
+		sgd.IsSpy = true
+	} else {
+		sgd.Prompt = game.Prompt
+	}
+	sgd.Timer = game.Timer
+
+	dat, err := json.Marshal(sgd)
+	if err != nil {
+		log.Println("Error Making SpyGame Data")
+		return
+	}
+	client.SendPacket(Packet{
+		From: "0",
+		To:   client.Id,
+		Type: "gameData",
+		Data: string(dat),
+	})
+}
+
 func (game *SpyGame) SendGameData() {
 	for _, client := range game.Room.Clients {
-		var sgd SpyGameData
-		if slices.Contains(game.Spies, client) {
-			sgd.IsSpy = true
-		} else {
-			sgd.Prompt = game.Prompt
-		}
-		sgd.Timer = game.Timer
-
-		dat, err := json.Marshal(sgd)
-		if err != nil {
-			log.Println("Error Making SpyGame Data")
-			return
-		}
-		client.SendPacket(Packet{
-			From: "0",
-			To:   client.Id,
-			Type: "gameData",
-			Data: string(dat),
-		})
+		game.SendUpdateToClient(client)
 	}
 }
 
 func (game *SpyGame) GetType() string {
 	return "spygame"
+}
+
+func (game *SpyGame) HandleClientSwap(oldClient *Client, newClient *Client) {
+	if slices.Contains(game.Spies, oldClient) {
+		game.Spies[slices.Index(game.Spies, oldClient)] = newClient
+	}
 }
