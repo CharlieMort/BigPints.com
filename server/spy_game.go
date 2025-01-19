@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand/v2"
 	"slices"
@@ -115,6 +116,7 @@ func (game *SpyGame) GetType() string {
 
 func (game *SpyGame) HandleClientSwap(oldClient *Client, newClient *Client) {
 	if slices.Contains(game.Spies, oldClient) {
+		fmt.Println("Swapped ", oldClient.Id, newClient.Id)
 		game.Spies[slices.Index(game.Spies, oldClient)] = newClient
 	}
 }

@@ -5,31 +5,40 @@ import { IClient, IPacket, IRoom, ISpyGame } from './types.ts';
 import RoomJoin from './Comps/RoomJoin.tsx';
 import Lobby from './Comps/Lobby.tsx';
 
+let c = false
+let currPacket = undefined
+
 function App() {
-  const [packet, setPacket] = useState<IPacket>()
+  // const [packet, setPacket] = useState<IPacket>()
   const [clientData, setClientData] = useState<IClient>()
   const [roomData, setRoomData] = useState<IRoom>()
   const [gameData, setGameData] = useState<ISpyGame>()
   const [connected, setConnected] = useState(false)
 
+  const clientSetup = () => {
+    setConnected(true)
+    c = true
+    if (sessionStorage.tabID == undefined) {
+        sessionStorage.tabID = crypto.randomUUID()
+    }
+    socket.send(JSON.stringify({
+      from: "0",
+      to: "0",
+      type: "setup",
+      data: `clientconnect ${sessionStorage.tabID}`
+    } as IPacket))
+    socket.send("ping")
+  }
+
   useEffect(() => {
     socket.onopen = () => {
       console.log("wagwan")
-      setConnected(true)
-      if (sessionStorage.tabID == undefined) {
-          sessionStorage.tabID = crypto.randomUUID()
-      }
-      socket.send(JSON.stringify({
-        from: "0",
-        to: "0",
-        type: "setup",
-        data: `clientconnect ${sessionStorage.tabID}`
-      } as IPacket))
-      socket.send("ping")
+      clientSetup()
     }
 
     socket.onclose = () => {
       setConnected(false)
+      c = false
       console.log("closed bruv")
     }
 
@@ -37,38 +46,35 @@ function App() {
       if (event.data == "pong") {
         socket.send("ping")
       } else {
-        setPacket(JSON.parse(event.data))
+        console.log("New Message "+JSON.parse(event.data).type)
+        if (!c) {
+          console.log("wagwan pt2")
+          clientSetup()
+        }
+        let packet = JSON.parse(event.data)
+        switch (packet.type) {
+          case "clientData":
+            setClientData(JSON.parse(packet.data))
+            break;
+          case "roomData":
+            setRoomData(JSON.parse(packet.data))
+            break;
+          case "gameData":
+            setGameData(JSON.parse(packet.data))
+            break
+        }
       }
     }
   }, [])
-
-  useEffect(() => {
-    if (packet === undefined) {
-      return
-    }
-    console.log("New Packet")
-    console.log(packet)
-    switch (packet.type) {
-      case "clientData":
-        setClientData(JSON.parse(packet.data))
-        break;
-      case "roomData":
-        setRoomData(JSON.parse(packet.data))
-        break;
-      case "gameData":
-        setGameData(JSON.parse(packet.data))
-        break
-    }
-  }, [packet])
 
   return (
     <div className="App">
       <h1>🍺BigPints.com</h1>
       <div className='content'>
         {
-          clientData === undefined || !connected
+          clientData === undefined || !c
           ? <div>
-              <h2>Connection Status: {connected?"Online":"Offline"}</h2>
+              <h2>Connection Status: {c?"Online":"Offline"}</h2>
               <button className='bigButton' onClick={() => window.location.reload()}>Reconnect</button>
             </div>
           : roomData === undefined

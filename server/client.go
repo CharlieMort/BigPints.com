@@ -99,7 +99,9 @@ func (client *Client) ReadPackets() {
 						client.SendClientJSON()
 					} else {
 						if client.Hub.rooms[client.RoomCode].Game != nil {
+							client.Hub.rooms[client.RoomCode].Game.HandleClientSwap(oldClient, client)
 							client.Hub.rooms[client.RoomCode].Game.SendUpdateToClient(client)
+							client.Hub.SendRoomUpdate(client.RoomCode)
 						}
 					}
 				} else {
@@ -131,7 +133,7 @@ func (client *Client) ReadPackets() {
 					game.SetupGame()
 
 					client.Hub.rooms[client.RoomCode].Game = game
-					//client.Hub.SendRoomUpdate(client.RoomCode)
+					client.Hub.SendRoomUpdate(client.RoomCode)
 
 					game.StartGame()
 				}
@@ -161,6 +163,7 @@ func (client *Client) WritePackets() {
 					err = client.Conn.WriteMessage(websocket.TextMessage, []byte("pong"))
 				}()
 			} else {
+				fmt.Println("Sending Packet To ", client.Id)
 				err = client.Conn.WriteJSON(packet)
 			}
 			if err != nil {

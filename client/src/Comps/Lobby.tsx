@@ -27,20 +27,14 @@ const Lobby = ({client, room}: ILobbyProps) => {
                 : <></>
             }
             <div className="lobby-grid">
-                <div className="Client-Frame">
-                    <h1>{client.name}</h1>
-                    <RemoteImage uuid={client.imguuid} />
-                </div>
                 {
                     room.clients.map((cl) => {
-                        if (cl.id != client.id) {
-                            return (
-                                <div className="Client-Frame">
-                                    <h1>{cl.name}</h1>
-                                    <RemoteImage uuid={cl.imguuid} />
-                                </div>
-                            )
-                        }
+                        return (
+                            <div className="Client-Frame">
+                                <h1>{cl.name}</h1>
+                                <RemoteImage uuid={cl.imguuid} />
+                            </div>
+                        )
                     })
                 }
             </div>
