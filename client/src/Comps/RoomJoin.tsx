@@ -61,7 +61,7 @@ const RoomJoin = ({client}: IRoomJoinProps) => {
                     <div className="panel-bot">
                         <label htmlFor="username">Enter A Name</label>
                         <input className="bigTextInput" id="username" type="text" placeholder="Your Name" value={nameTmp} onChange={(e) => {
-                            if (e.target.value.length < 12) {
+                            if (e.target.value.length < 11) {
                                 setNameTmp(e.target.value)
                             }
                         }}/>
