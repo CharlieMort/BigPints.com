@@ -12,13 +12,11 @@ type SpyGame struct {
 	Type   string
 	Spies  []*Client
 	Prompt string
-	Timer  int
 }
 
 type SpyGameData struct {
 	Prompt string `json:"prompt"`
 	IsSpy  bool   `json:"isSpy"`
-	Timer  int    `json:"timer"`
 }
 
 func GetRandomPrompt() string {
@@ -74,7 +72,6 @@ func GetRandomPrompt() string {
 func (game *SpyGame) SetupGame() {
 	game.Prompt = GetRandomPrompt()
 	game.Spies = make([]*Client, 0)
-	game.Timer = 0
 	spyAmt := 1
 	for i := 0; i < spyAmt; i++ {
 		game.Spies = append(game.Spies, game.Room.Clients[rand.IntN(len(game.Room.Clients))])
@@ -83,13 +80,6 @@ func (game *SpyGame) SetupGame() {
 
 func (game *SpyGame) StartGame() {
 	game.SendGameData()
-	// go func() {
-	// 	for game.Timer < 10 {
-	// 		game.SendGameData()
-	// 		game.Timer += 1
-	// 		time.Sleep(time.Millisecond * 500)
-	// 	}
-	// }()
 }
 
 func (game *SpyGame) SendUpdateToClient(client *Client) {
@@ -99,7 +89,6 @@ func (game *SpyGame) SendUpdateToClient(client *Client) {
 	} else {
 		sgd.Prompt = game.Prompt
 	}
-	sgd.Timer = game.Timer
 
 	dat, err := json.Marshal(sgd)
 	if err != nil {

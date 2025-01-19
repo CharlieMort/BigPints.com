@@ -63,23 +63,23 @@ function App() {
 
   return (
     <div className="App">
-      <h1>🍺BigPint.com</h1>
-      {
-        clientData === undefined || !connected
-        ? <div>
-            <h2>Connection Status: {connected?"Online":"Offline"}</h2>
-            <button onClick={() => window.location.reload()}>Reconnect</button>
-          </div>
-        : roomData === undefined
-          ? <RoomJoin client={clientData} />
-          : roomData.gameType === ""
-            ? <Lobby client={clientData} room={roomData} />
+      <h1>🍺BigPints.com</h1>
+      <div className='content'>
+        {
+          clientData === undefined || !connected
+          ? <div>
+              <h2>Connection Status: {connected?"Online":"Offline"}</h2>
+              <button className='bigButton' onClick={() => window.location.reload()}>Reconnect</button>
+            </div>
+          : roomData === undefined
+            ? <RoomJoin client={clientData} />
             : gameData === undefined
-              ? <h2>{roomData.gameType}</h2>
+              ? <Lobby client={clientData} room={roomData} />
               : <div>
                   <h2>{gameData.isSpy?"SPY":gameData.prompt}</h2>
                 </div>
-      }
+        }
+      </div>
     </div>
   );
 }

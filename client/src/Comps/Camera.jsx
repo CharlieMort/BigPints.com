@@ -17,20 +17,11 @@ const Cam = ({setImgUUID}) => {
     });
   }
 
-  // useEffect(() => {
-  //   if (image != null) {
-  //     fetch(`http://localhost:80/api/image/get/${image}`, {
-  //       method: "GET"
-  //     }).then((r) => {
-  //       r.text().then((dat) => setImageData(dat))
-  //     })
-  //   }
-  // }, [image])
-
   return (
     <div className="Camera">
+      <h1>Take A Photo !</h1>
       <Camera ref={camera} aspectRatio={1} />
-      <button style={{position: "absolute", top:"0", left:"0", zIndex: "45"}} onClick={takePhoto}>Take photo</button>
+      <button className="Camera_Button" onClick={takePhoto}>📷</button>
     </div>
   );
 }

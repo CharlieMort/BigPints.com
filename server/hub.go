@@ -94,7 +94,6 @@ func (h *Hub) SendRoomUpdate(roomCode string) {
 			Data: string(dat),
 		})
 	}
-	fmt.Println()
 }
 
 func (h *Hub) CreateRoom() string {
@@ -118,7 +117,6 @@ func (h *Hub) JoinRoom(client *Client, roomCode string) bool {
 		h.rooms[roomCode].Clients = append(h.rooms[roomCode].Clients, client)
 		client.RoomCode = roomCode
 		h.SendRoomUpdate(roomCode)
-		client.SendClientJSON()
 		log.Printf("Client:%s Joined the Room:%s", client.Id, roomCode)
 		return true
 	} else {

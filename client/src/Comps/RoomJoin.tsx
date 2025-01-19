@@ -59,8 +59,12 @@ const RoomJoin = ({client}: IRoomJoinProps) => {
                 name === "" && client.name === ""
                 ? <div>
                     <div className="panel-bot">
-                        <label htmlFor="username">Enter Your Name</label>
-                        <input className="bigTextInput" id="username" type="text" placeholder="Your Name" value={nameTmp} onChange={(e) => setNameTmp(e.target.value)}/>
+                        <label htmlFor="username">Enter A Name</label>
+                        <input className="bigTextInput" id="username" type="text" placeholder="Your Name" value={nameTmp} onChange={(e) => {
+                            if (e.target.value.length < 12) {
+                                setNameTmp(e.target.value)
+                            }
+                        }}/>
                         <input className="bigButton" id="joinbutton" type="button" value="Next" onClick={SubmitName} />
                     </div>
                 </div>
@@ -71,11 +75,10 @@ const RoomJoin = ({client}: IRoomJoinProps) => {
                     : joinRoom
                         ? <div className="panel-bot">
                             <label htmlFor="roomcode">Enter the Room Code</label>
-                            <input className="bigTextInput" id="roomcode" type="text" placeholder="Room Code" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
+                            <input className="bigTextInput" id="roomcode" type="number" placeholder="Room Code" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
                             <input className="bigButton" id="joinbutton" type="button" value="Join" onClick={JoinRoom} />
                         </div>
                         : <div className="panel-bot">
-                            <h1>{client.imguuid}</h1>
                             <input className="bigButton" id="joinRoomButton" type="button" value="Join Room" onClick={() => setJoinRoom(true)} />
                             <input className="bigButton" id="createRoomButton" type="button" value="Create Room" onClick={CreateRoom} />
                         </div>

@@ -19,15 +19,15 @@ const Lobby = ({client, room}: ILobbyProps) => {
     }
 
     return(
-        <div>
+        <div className="lobby">
             <h2>RoomCode: {room.roomCode}</h2>
             {
                 room.host.id === client.id && room.clients.length > 1
                 ? <input className="bigButton" type="button" value="Start Game" onClick={StartGame} />
                 : <></>
             }
-            <div className="lobby">
-                <div>
+            <div className="lobby-grid">
+                <div className="Client-Frame">
                     <h1>{client.name}</h1>
                     <RemoteImage uuid={client.imguuid} />
                 </div>
@@ -35,7 +35,7 @@ const Lobby = ({client, room}: ILobbyProps) => {
                     room.clients.map((cl) => {
                         if (cl.id != client.id) {
                             return (
-                                <div>
+                                <div className="Client-Frame">
                                     <h1>{cl.name}</h1>
                                     <RemoteImage uuid={cl.imguuid} />
                                 </div>

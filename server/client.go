@@ -48,6 +48,7 @@ func (client *Client) GetJSON() string {
 }
 
 func (client *Client) SendClientJSON() {
+	fmt.Println("Sending Client JSON")
 	dat := client.GetJSON()
 	client.SendPacket(Packet{
 		From: "0",
@@ -130,7 +131,7 @@ func (client *Client) ReadPackets() {
 					game.SetupGame()
 
 					client.Hub.rooms[client.RoomCode].Game = game
-					client.Hub.SendRoomUpdate(client.RoomCode)
+					//client.Hub.SendRoomUpdate(client.RoomCode)
 
 					game.StartGame()
 				}
