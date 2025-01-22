@@ -82,7 +82,7 @@ function App() {
             ? <RoomJoin client={clientData} />
             : gameData === undefined
               ? <Lobby client={clientData} room={roomData} />
-              : <SpyGame gameData={gameData} />
+              : <SpyGame gameData={gameData} roomData={roomData} clientData={clientData} />
         }
       </div>
     </div>

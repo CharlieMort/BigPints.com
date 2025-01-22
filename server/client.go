@@ -138,6 +138,15 @@ func (client *Client) ReadPackets() {
 					game.StartGame()
 				}
 			}
+		case "toGame":
+			sysCmd := strings.Split(packet.Data, " ")
+			game := client.Hub.rooms[client.RoomCode].Game
+			switch sysCmd[0] {
+			case "ready":
+				game.ReadyUp(client)
+			case "nextPlayer":
+				game.GameTick(client)
+			}
 		}
 	}
 }

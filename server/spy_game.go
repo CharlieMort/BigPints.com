@@ -9,15 +9,20 @@ import (
 )
 
 type SpyGame struct {
-	Room   *Room
-	Type   string
-	Spies  []*Client
-	Prompt string
+	Room          *Room
+	Type          string
+	Spies         []*Client
+	Prompt        string
+	Ready         []string
+	QuestionStack []*Client
 }
 
 type SpyGameData struct {
-	Prompt string `json:"prompt"`
-	IsSpy  bool   `json:"isSpy"`
+	Prompt         string     `json:"prompt"`
+	IsSpy          bool       `json:"isSpy"`
+	IsReady        bool       `json:"isReady"`
+	ReadyString    string     `json:"readyString"`
+	QuestionClient ClientJSON `json:"questionClient"`
 }
 
 func GetRandomPrompt() string {
@@ -91,6 +96,15 @@ func (game *SpyGame) SendUpdateToClient(client *Client) {
 		sgd.Prompt = game.Prompt
 	}
 
+	if slices.Contains(game.Ready, client.Id) {
+		sgd.IsReady = true
+	}
+	sgd.ReadyString = fmt.Sprintf(`%d/%d`, len(game.Ready), len(game.Room.Clients))
+
+	if len(game.QuestionStack) > 0 {
+		sgd.QuestionClient = game.QuestionStack[0].ClientJSON
+	}
+
 	dat, err := json.Marshal(sgd)
 	if err != nil {
 		log.Println("Error Making SpyGame Data")
@@ -118,5 +132,32 @@ func (game *SpyGame) HandleClientSwap(oldClient *Client, newClient *Client) {
 	if slices.Contains(game.Spies, oldClient) {
 		fmt.Println("Swapped ", oldClient.Id, newClient.Id)
 		game.Spies[slices.Index(game.Spies, oldClient)] = newClient
+	}
+}
+
+func (game *SpyGame) ReadyUp(client *Client) {
+	if !slices.Contains(game.Ready, client.Id) {
+		game.Ready = append(game.Ready, client.Id)
+		if len(game.Ready) == len(game.Room.Clients) {
+			game.QuestionStack = make([]*Client, len(game.Room.Clients))
+			if copy(game.QuestionStack, game.Room.Clients) == 0 {
+				fmt.Println("It just didnt copy")
+			}
+			for i := 0; i < 10; i++ {
+				idx1 := rand.IntN(len(game.QuestionStack))
+				idx2 := rand.IntN(len(game.QuestionStack))
+				tmp := game.QuestionStack[idx1]
+				game.QuestionStack[idx1] = game.QuestionStack[idx2]
+				game.QuestionStack[idx2] = tmp
+			}
+		}
+		game.SendGameData()
+	}
+}
+
+func (game *SpyGame) GameTick(client *Client) {
+	if len(game.QuestionStack) > 0 {
+		game.QuestionStack = RemoveClient(game.QuestionStack, 0)
+		game.SendGameData()
 	}
 }

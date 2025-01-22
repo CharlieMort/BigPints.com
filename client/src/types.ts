@@ -22,7 +22,9 @@ export interface IPacket {
 export interface ISpyGame {
   isSpy: boolean
   prompt: string
-  timer: number
+  isReady: boolean
+  readyString: string
+  questionClient: IClient
 }
 
 export interface ISettings {
