@@ -20,7 +20,8 @@ const Lobby = ({client, room}: ILobbyProps) => {
 
     return(
         <div className="lobby">
-            <h2>RoomCode: {room.roomCode}</h2>
+            <h1>Room Code</h1>
+            <h2>{room.roomCode}</h2>
             {
                 room.host.id === client.id && room.clients.length > 1
                 ? <input className="bigButton" type="button" value="Start Game" onClick={StartGame} />

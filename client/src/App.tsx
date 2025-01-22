@@ -4,6 +4,7 @@ import { socket, SOCKURL } from './Comps/socket.ts';
 import { IClient, IPacket, IRoom, ISpyGame } from './types.ts';
 import RoomJoin from './Comps/RoomJoin.tsx';
 import Lobby from './Comps/Lobby.tsx';
+import SpyGame from './Comps/SpyGame.tsx';
 
 let c = false
 let currPacket = undefined
@@ -81,9 +82,7 @@ function App() {
             ? <RoomJoin client={clientData} />
             : gameData === undefined
               ? <Lobby client={clientData} room={roomData} />
-              : <div>
-                  <h2>{gameData.isSpy?"SPY":gameData.prompt}</h2>
-                </div>
+              : <SpyGame gameData={gameData} />
         }
       </div>
     </div>
